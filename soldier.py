@@ -4,14 +4,15 @@ from settings import *
 
 
 class Soldier(pygame.sprite.Sprite):
-    def __init__(self, char_type, x, y, scale, speed, ammo):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, char_type, x, y, scale, speed, ammo, grenades):
+        super().__init__()
         self.alive = True
         self.char_type = char_type
         self.speed = speed
         self.ammo = ammo
         self.start_ammo = ammo
         self.shoot_cooldown = 0
+        self.grenades = grenades
         self.health = 100
         self.max_health = self.health
         self.direction = 1
