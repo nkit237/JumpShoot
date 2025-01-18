@@ -42,9 +42,13 @@ class Soldier(pygame.sprite.Sprite):
 
     def update(self):
         self.update_animation()
+        alive = self.alive
         self.check_alive()
+        if self.char_type == 'enemy' and self.alive != alive:
+            return 5
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
+        return 0
 
     def move(self, moving_left, moving_right):
         dx = 0
@@ -77,7 +81,7 @@ class Soldier(pygame.sprite.Sprite):
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
             self.shoot_cooldown = 20
-            bullet = Bullet(self.rect.centerx + (0.6 * self.rect.size[0] * self.direction), self.rect.centery,
+            bullet = Bullet(self.rect.centerx + (0.43 * self.rect.size[0] * self.direction), self.rect.centery,
                             self.direction)
             bullet_group.add(bullet)
             self.ammo -= 1

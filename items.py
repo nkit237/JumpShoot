@@ -20,4 +20,8 @@ class ItemBox(pygame.sprite.Sprite):
                     player.ammo += 15
                 elif self.item_type == 'Grenade':
                     player.grenades += 3
+                elif self.item_type == 'Bonus':
+                    self.kill()
+                    return 10
                 self.kill()
+        return 0

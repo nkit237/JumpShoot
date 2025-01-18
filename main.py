@@ -6,6 +6,9 @@ from interface import *
 clock = pygame.time.Clock()
 FPS = 60
 
+bonus_point = 0
+kill_point = 0
+
 moving_left = False
 moving_right = False
 shoot = False
@@ -31,11 +34,11 @@ def draw_bg():
 	pygame.draw.line(screen, RED, (0, 500), (SCREEN_WIDTH, 500))
 
 
-player = Soldier('player', 200, 200, 3, 5, 20, 5)
+player = Soldier('player', 200, 200, 2.5, 5, 20, 5)
 player_group.add(player)
 enemy = Soldier('enemy', 400, 200, 3, 5, 20, 0)
 enemy_group.add(enemy)
-enemy2 = Soldier('enemy', 300, 400, 3, 5, 20, 0)
+enemy2 = Soldier('enemy', 300, 450, 3, 5, 20, 0)
 enemy_group.add(enemy2)
 
 item_box = ItemBox('Health', 100, 460)
@@ -43,6 +46,8 @@ item_box_group.add(item_box)
 item_box = ItemBox('Ammo', 400, 460)
 item_box_group.add(item_box)
 item_box = ItemBox('Grenade', 500, 460)
+item_box_group.add(item_box)
+item_box = ItemBox('Bonus', 600, 460)
 item_box_group.add(item_box)
 
 health_bar = HealthBar(10, 10, player.health, player.health)
@@ -55,18 +60,20 @@ while run:
 	draw_bg()
 
 	health_bar.draw(player.health, screen)
-	draw_text('Пули: ', font, WHITE, 10, 35)
+
+	draw_text('Пули: ', font, BLACK, 10, 35)
 	for x in range(player.ammo):
 		screen.blit(bullet_img, (90 + (x * 10), 40))
-	draw_text('Гранаты: ', font, WHITE, 10, 60)
+	draw_text('Гранаты: ', font, BLACK, 10, 60)
 	for x in range(player.grenades):
 		screen.blit(grenade_img, (135 + (x * 15), 60))
+	draw_text(f'Очки: {bonus_point + kill_point}', font, BLACK, 10, 85)
 
 	player.update()
 	player.draw()
 
 	for enemy in enemy_group:
-		enemy.update()
+		kill_point += enemy.update()
 		enemy.draw()
 
 	bullet_group.update()
@@ -78,8 +85,9 @@ while run:
 	explosion_group.update()
 	explosion_group.draw(screen)
 
-	item_box_group.update()
-	item_box_group.draw(screen)
+	for item in item_box_group:
+		bonus_point += item.update()
+		item_box_group.draw(screen)
 
 	if player.alive:
 		if shoot:

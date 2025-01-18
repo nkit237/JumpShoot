@@ -18,10 +18,13 @@ ammo_box_img = pygame.image.load('data/img/icons/ammo_box.png').convert()
 ammo_box_img.set_colorkey((255, 255, 255))
 grenade_box_img = pygame.image.load('data/img/icons/grenade_box.png').convert()
 grenade_box_img.set_colorkey((255, 255, 255))
+bonus_box_img = pygame.image.load('data/img/icons/bonus_box.png').convert()
+bonus_box_img.set_colorkey((255, 255, 255))
 item_boxes = {
     'Health': health_box_img,
     'Ammo': ammo_box_img,
-    'Grenade': grenade_box_img
+    'Grenade': grenade_box_img,
+    'Bonus': bonus_box_img
 }
 
 GRAVITY = 0.75
