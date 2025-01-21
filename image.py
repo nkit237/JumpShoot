@@ -26,7 +26,6 @@ bullet_img.set_colorkey((255, 255, 255))
 
 mountain_img = pygame.image.load('data/img/Background/mountain.png').convert()
 mountain_img.set_colorkey((255, 255, 255))
-mountain_img = pygame.transform.scale(mountain_img, (int(mountain_img.get_width()), int(400)))
 sky_img = pygame.image.load('data/img/Background/sky_cloud.png').convert_alpha()
 
 start_img = pygame.image.load('data/img/start_btn.png').convert_alpha()
