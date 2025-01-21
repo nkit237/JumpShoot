@@ -1,6 +1,11 @@
 import os
-from bullet import *
+import pygame
+from math import inf
+import random
+from image import *
+from bullet import Bullet
 from settings import *
+from create_pers import *
 
 
 class Soldier(pygame.sprite.Sprite):
@@ -24,6 +29,9 @@ class Soldier(pygame.sprite.Sprite):
         self.frame_index = 0
         self.action = 0
         self.update_time = pygame.time.get_ticks()
+        self.move_counter = 0
+        self.idling = False
+        self.idling_counter = 0
 
         animation_types = ['Idle', 'Run', 'Jump', 'Death']
         for animation in animation_types:
@@ -39,18 +47,24 @@ class Soldier(pygame.sprite.Sprite):
         self.image = self.animation_list[self.action][self.frame_index]
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
     def update(self):
         self.update_animation()
-        alive = self.alive
+        alife = self.alive
         self.check_alive()
-        if self.char_type == 'enemy' and self.alive != alive:
-            return 5
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= 1
-        return 0
+        if self.char_type == 'enemy' and alife != self.alive and self.alive == False:
+            return 5
+        elif self.char_type == 'enemy':
+            return 0
 
-    def move(self, moving_left, moving_right):
+    def move(self, moving_left, moving_right, world, *args):
+        if args:
+            bg_scroll = args[0]
+        SCREEN_SCROLL = 0
         dx = 0
         dy = 0
 
@@ -63,28 +77,103 @@ class Soldier(pygame.sprite.Sprite):
             self.flip = False
             self.direction = 1
 
-        if self.jump == True and self.in_air == False:
-            self.vel_y = -11
+        if self.jump and not self.in_air:
+            self.vel_y = -17
             self.jump = False
             self.in_air = True
 
         self.vel_y += GRAVITY
         dy += self.vel_y
 
-        if self.rect.bottom + dy > 500:
-            dy = 500 - self.rect.bottom
-            self.in_air = False
+        for tile in world.obstacle_list:
+            if tile[1].colliderect(self.rect.x + dx, self.rect.y, self.width, self.height):
+                dx = 0
+                if self.char_type == 'enemy':
+                    self.direction *= -1
+                    self.move_counter = 0
+            if tile[1].colliderect(self.rect.x, self.rect.y + dy, self.width, self.height):
+                if self.vel_y < 0:
+                    self.vel_y = 0
+                    dy = tile[1].bottom - self.rect.top
+                elif self.vel_y >= 0:
+                    self.vel_y = 0
+                    self.in_air = False
+                    dy = tile[1].top - self.rect.bottom
+
+        if pygame.sprite.spritecollide(self, water_group, False):
+            self.health = 0
+            SCREEN_SCROLL = 0
+            dx = 0
+
+        level_complete = False
+        if pygame.sprite.spritecollide(self, exit_group, False):
+            level_complete = True
+
+        if self.rect.bottom > SCREEN_HEIGHT:
+            self.health = 0
+            SCREEN_SCROLL = 0
+            dx = 0
+
+        if self.char_type == 'player':
+            if self.rect.left + dx < 0 or self.rect.right + dx > SCREEN_WIDTH:
+                dx = 0
+
+        if dy > 0.75:
+            self.in_air = True
 
         self.rect.x += dx
         self.rect.y += dy
 
+        if self.char_type == 'player':
+            if (self.rect.right > SCREEN_WIDTH - SCROLL_THRESH and bg_scroll < (
+                    world.level_length * TILE_SIZE) - SCREEN_WIDTH) \
+                    or (self.rect.left < SCROLL_THRESH and bg_scroll > abs(dx)):
+                self.rect.x -= dx
+                SCREEN_SCROLL = -dx
+
+        return SCREEN_SCROLL, level_complete
+
     def shoot(self):
         if self.shoot_cooldown == 0 and self.ammo > 0:
-            self.shoot_cooldown = 20
-            bullet = Bullet(self.rect.centerx + (0.43 * self.rect.size[0] * self.direction), self.rect.centery,
+            self.shoot_cooldown = 40
+            bullet = Bullet(self.rect.centerx + (0.5 * self.rect.size[0] * self.direction), self.rect.centery + 2,
                             self.direction)
             bullet_group.add(bullet)
             self.ammo -= 1
+            shot_fx.play()
+
+    def ai(self, player, world, SCREEN_SCROLL):
+        if self.alive and player.alive:
+            if not self.idling and random.randint(1, 200) == 1:
+                self.update_action(0)
+                self.idling = True
+                self.idling_counter = 50
+            abc = -(self.rect.x - player.rect.x)
+            if abc and len([y for y in range(self.rect.y - 1, self.rect.y + 2) if y == player.rect.y]) and (
+                    abs(abc) <= 150 and (abc // abs(abc)) == self.direction) and self.move_counter > 1:
+                self.update_action(0)
+                self.shoot()
+            else:
+                self.f = False
+                if not self.idling:
+                    if self.direction == 1:
+                        ai_moving_right = True
+                    else:
+                        ai_moving_right = False
+                    ai_moving_left = not ai_moving_right
+                    self.move(ai_moving_left, ai_moving_right, world)
+                    self.update_action(1)
+                    self.move_counter += 1
+
+                    if self.move_counter > TILE_SIZE:
+                        self.direction *= -1
+                        self.move_counter *= -1
+                else:
+                    self.idling_counter -= 1
+                    if self.idling_counter <= 0:
+                        self.idling = False
+
+        self.rect.x += SCREEN_SCROLL
 
     def update_animation(self):
         ANIMATION_COOLDOWN = 100
@@ -111,5 +200,5 @@ class Soldier(pygame.sprite.Sprite):
             self.alive = False
             self.update_action(3)
 
-    def draw(self):
+    def draw(self, screen):
         screen.blit(pygame.transform.flip(self.image, self.flip, False), self.rect)
