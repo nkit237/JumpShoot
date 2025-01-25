@@ -1,11 +1,9 @@
 import pygame
+
+from message import Message
 from settings import *
 from image import *
-
-
-def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col)
-    screen.blit(img, (x, y))
+from create_pers import *
 
 
 class ItemBox(pygame.sprite.Sprite):
@@ -34,6 +32,7 @@ class ItemBox(pygame.sprite.Sprite):
             elif self.item_type == 'Bonus':
                 self.kill()
                 return 10
-            draw_text(f'+{self.count}', pygame.font.SysFont('consolas', 20), 'yellow', self.rect.x, self.rect.y)
+            message = Message(self.count, player.rect.midtop[0], player.rect.midtop[1])
+            message_group.add(message)
             self.kill()
         return 0

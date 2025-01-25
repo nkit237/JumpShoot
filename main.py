@@ -50,6 +50,7 @@ def reset_level():
     water_group.empty()
     exit_group.empty()
     bird_group.empty()
+    message_group.empty()
 
     data = []
     for row in range(ROWS):
@@ -228,6 +229,8 @@ while PLAY:
         for i in item_box_group:
             bonus_point += i.update(player, SCREEN_SCROLL)
         item_box_group.draw(screen)
+
+        message_group.update()
 
         decoration_group.update(SCREEN_SCROLL)
         decoration_group.draw(screen)

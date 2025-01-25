@@ -83,3 +83,8 @@ class Bird(pygame.sprite.Sprite):
                 if abs(self.rect.centerx - enemy.rect.centerx) < TILE_SIZE * 2 and \
                         abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 50
+
+
+def bombs(self, player):
+    if player.rect.midtop[1] == self.rect.y:
+        pass
