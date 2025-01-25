@@ -1,10 +1,11 @@
+import random
+
 import button
 import csv
 from granade import *
 from fade import *
 from world import *
-from bullet import *
-from image import *
+from splashes import *
 
 font = pygame.font.SysFont('consolas', 20)
 font1 = pygame.font.SysFont('consolas', 65)
@@ -23,6 +24,18 @@ def draw_bg():
         screen.blit(mountain_img, ((x * width) - bg_scroll * 0.6, SCREEN_HEIGHT - mountain_img.get_height()))
 
 
+def create_particles(position):
+    particle_count = random.randint(8, 30)
+    numbers_x = range(-4, 5)
+    numbers_y = range(-6, 1)
+    for _ in range(particle_count):
+        Particle(position, random.choice(numbers_x), random.choice(numbers_y))
+
+
+splashes_pos = [(113, 274), (387, 331), (752, 233), (1089, 227),
+                (1489, 274), (1763, 331), (2128, 233), (2465, 227),
+                (2865, 274), (3139, 331), (3504, 233), (3841, 227)]
+
 moving_left = False
 moving_right = False
 shoot = False
@@ -38,6 +51,7 @@ kill_point = 0
 bonus_point = 0
 bird_point = 0
 final_menu = False
+splashes_cooldown = 0
 
 
 def reset_level():
@@ -87,6 +101,14 @@ FPS = 60
 PLAY = True
 while PLAY:
     clock.tick(FPS)
+
+    for pos in splashes_pos:
+        if splashes_cooldown == 0:
+            x, y = pos
+            create_particles((x - bg_scroll * 0.6, y))
+            splashes_cooldown = random.randint(20, 100)
+        splashes_cooldown -= 1
+
     if info:
         screen.fill('black')
         screen.blit(Governance, (0, 0))
@@ -191,7 +213,12 @@ while PLAY:
     else:
         draw_bg()
 
+        splashes_group.update(SCREEN_SCROLL)
+        splashes_group.draw(screen)
+
         world.draw(SCREEN_SCROLL)
+
+        draw_text('Здоровье: ', font, 'white', 10, 10)
 
         draw_text('Пули: ', font, 'white', 10, 35)
         for x in range(player.ammo):
