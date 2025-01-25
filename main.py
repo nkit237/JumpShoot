@@ -1,5 +1,4 @@
-import random
-
+import time
 import button
 import csv
 from granade import *
@@ -99,8 +98,15 @@ main_menu_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT - 250, m
 clock = pygame.time.Clock()
 FPS = 60
 PLAY = True
+TIMER = -1
+SUM_TIMER = 0
+
 while PLAY:
     clock.tick(FPS)
+    if TIMER != -1 and not pause and level <= 3:
+        time1 = time.strftime("%H:%M:%S").split(':')
+        TIMER_NOW = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+        TIMER = TIMER_NOW - TIMER_START
 
     for pos in splashes_pos:
         if splashes_cooldown == 0:
@@ -121,6 +127,7 @@ while PLAY:
         t3 = f'За сбор бонусов вы набрали {bonus_point} очков!'
         draw_text('ПОЗДРАВЛЯЕМ!', font, 'black', SCREEN_WIDTH * 0.4375, 100)
         draw_text('ВЫ ВЫИГРАЛИ!', font, 'black', SCREEN_WIDTH * 0.4375, 120)
+        draw_text(f'Время: {SUM_TIMER + TIMER}', font, 'black', 0, 0)
         draw_text(t1, font, 'black', SCREEN_WIDTH * 0.25, 140)
         draw_text(t2, font, 'black', SCREEN_WIDTH * 0.25, 160)
         draw_text(t3, font, 'black', SCREEN_WIDTH * 0.25, 180)
@@ -152,6 +159,9 @@ while PLAY:
         screen.fill('darkred')
         draw_text('JumpShoot', font1, 'black', SCREEN_WIDTH * 0.34, 50)
         if start_button.draw(screen):
+            time1 = time.strftime("%H:%M:%S").split(':')
+            TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+            TIMER = 0
             start_game = True
             start_intro = True
         if Governance_and_rules_button.draw(screen):
@@ -164,6 +174,9 @@ while PLAY:
             screen.fill('darkred')
             draw_text('Меню', font1, 'black', SCREEN_WIDTH * 0.427, 50)
             if restart_button.draw(screen):
+                time1 = time.strftime("%H:%M:%S").split(':')
+                TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                TIMER = 0
                 kill_point = 0
                 bonus_point = 0
                 bird_point = 0
@@ -185,6 +198,9 @@ while PLAY:
             if exit_button.draw(screen):
                 PLAY = False
             if start_button.draw(screen):
+                time1 = time.strftime("%H:%M:%S").split(':')
+                TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                TIMER = 0
                 menu = False
                 pause = False
             if Governance_and_rules_button.draw(screen):
@@ -295,6 +311,7 @@ while PLAY:
                 bg_scroll = 0
                 world_data = reset_level()
                 if level <= MAX_LEVELS:
+                    SUM_TIMER += TIMER
 
                     with open(f'level{level}_data.csv', newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
@@ -333,6 +350,9 @@ while PLAY:
                 if exit_button.draw(screen):
                     PLAY = False
                 if restart_button.draw(screen):
+                    time1 = time.strftime("%H:%M:%S").split(':')
+                    TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                    TIMER = 0
                     kill_point = 0
                     bonus_point = 0
                     bird_point = 0
