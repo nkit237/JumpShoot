@@ -10,6 +10,6 @@ water_group = pygame.sprite.Group()
 decoration_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
-
+splashes_group = pygame.sprite.Group()
 
 

@@ -31,7 +31,7 @@ class World:
                         decoration_group.add(decoration)
                     elif tile == 15:
                         player = Soldier('player', x * TILE_SIZE, y * TILE_SIZE, 1.65, 5, 20, 5)
-                        health_bar = HealthBar(10, 10, player.health, player.health)
+                        health_bar = HealthBar(135, 10, player.health, player.health)
                     elif tile == 16:
                         enemy = Soldier('enemy', x * TILE_SIZE, y * TILE_SIZE, 1.65, 2, 10 ** 10, 0)
                         enemy_group.add(enemy)
