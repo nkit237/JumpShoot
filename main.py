@@ -1,7 +1,7 @@
-import random
-
+import time
 import button
 import csv
+import sqlite3
 from granade import *
 from fade import *
 from world import *
@@ -87,8 +87,8 @@ with open(f'level{level}_data.csv', newline='') as csvfile:
 world = World()
 player, health_bar = world.process_data(world_data)
 
-intro_fade = ScreenFade(1, 'red', 4)
-death_fade = ScreenFade(2, '#660000', 4)
+intro_fade = ScreenFade(1, 'black', 8)
+death_fade = ScreenFade(2, '#660000', 6)
 
 start_button = button.Button(SCREEN_WIDTH // 2 - 130, SCREEN_HEIGHT // 2 - 150, start_img, 1)
 exit_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT // 2 + 200, exit_img, 1)
@@ -100,8 +100,15 @@ main_menu_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT - 250, m
 clock = pygame.time.Clock()
 FPS = 60
 PLAY = True
+TIMER = -1
+SUM_TIMER = 0
+
 while PLAY:
     clock.tick(FPS)
+    if TIMER != -1 and not pause and level <= 3:
+        time1 = time.strftime("%H:%M:%S").split(':')
+        TIMER_NOW = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+        TIMER = TIMER_NOW - TIMER_START
 
     for pos in splashes_pos:
         if splashes_cooldown == 0:
@@ -117,15 +124,49 @@ while PLAY:
             info = False
     elif final_menu:
         screen.fill('darkred')
+        h = str(SUM_TIMER + TIMER // 360).zfill(2)
+        m = str((SUM_TIMER + TIMER // 60) % 60).zfill(2)
+        s = str(SUM_TIMER + TIMER % 360).zfill(2)
         t1 = f'За поражённых  противников вы набрали {kill_point} очков!'
         t2 = f'За поражённых птиц вы набрали {bird_point} очков!'
         t3 = f'За сбор бонусов вы набрали {bonus_point} очков!'
-        draw_text('ПОЗДРАВЛЯЕМ!', font, 'black', SCREEN_WIDTH * 0.4375, 100)
-        draw_text('ВЫ ВЫИГРАЛИ!', font, 'black', SCREEN_WIDTH * 0.4375, 120)
-        draw_text(t1, font, 'black', SCREEN_WIDTH * 0.25, 140)
-        draw_text(t2, font, 'black', SCREEN_WIDTH * 0.25, 160)
-        draw_text(t3, font, 'black', SCREEN_WIDTH * 0.25, 180)
+        t4 = f'Затраченное время: {h}.{m}.{s}'
+        draw_text('ПОЗДРАВЛЯЕМ!', font, 'black', SCREEN_WIDTH * 0.4375, 80)
+        draw_text('ВЫ ВЫИГРАЛИ!', font, 'black', SCREEN_WIDTH * 0.4375, 100)
+        draw_text(t1, font, 'black', SCREEN_WIDTH * 0.25, 120)
+        draw_text(t2, font, 'black', SCREEN_WIDTH * 0.25, 140)
+        draw_text(t3, font, 'black', SCREEN_WIDTH * 0.25, 160)
+        draw_text(t4, font, 'black', SCREEN_WIDTH * 0.25, 180)
         draw_text(f'Общий счёт: {kill_point + bonus_point + bird_point}', font, 'black', SCREEN_WIDTH * 0.25, 200)
+
+        conn = sqlite3.connect('statistics.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT enemy, bird, bonus, time, checks FROM statistics")
+        st = cursor.fetchall()[0]
+        stat_p_enemy, stat_p_bird, stat_p_bonus, stat_time, stat_checks = st[0], st[1], st[2], st[3], st[4]
+        cursor.execute("DELETE FROM statistics")
+        stat_p_enemy = str(max(int(stat_p_enemy), kill_point))
+        stat_p_bird = str(max(int(stat_p_bird), bird_point))
+        stat_p_bonus = str(max(int(stat_p_bonus), bonus_point))
+        stat_time = str(min(int(stat_time), SUM_TIMER + TIMER))
+        stat_checks = str(max(int(stat_checks), kill_point + bird_point + bonus_point))
+        cursor.execute("INSERT INTO statistics (enemy, bird, bonus, time, checks) VALUES (?, ?, ?, ?, ?)",
+                       (stat_p_enemy, stat_p_bird, stat_p_bonus, stat_time, stat_checks))
+        conn.commit()
+
+        h = str(int(stat_time) // 360).zfill(2)
+        m = str((int(stat_time) // 60) % 60).zfill(2)
+        s = str(int(stat_time) % 360).zfill(2)
+        t1 = f'За поражённых  противников вы набрали {stat_p_enemy} очков!'
+        t2 = f'За поражённых птиц вы набрали {stat_p_bird} очков!'
+        t3 = f'За сбор бонусов вы набрали {stat_p_bonus} очков!'
+        t4 = f'Затраченное время: {h}.{m}.{s}'
+        draw_text('Лучшие результаты:', font, 'black', SCREEN_WIDTH * 0.4, 240)
+        draw_text(t1, font, 'black', SCREEN_WIDTH * 0.25, 260)
+        draw_text(t2, font, 'black', SCREEN_WIDTH * 0.25, 280)
+        draw_text(t3, font, 'black', SCREEN_WIDTH * 0.25, 300)
+        draw_text(t4, font, 'black', SCREEN_WIDTH * 0.25, 320)
+        draw_text(f'Общий счёт: {stat_checks}', font, 'black', SCREEN_WIDTH * 0.25, 340)
         if main_menu_button.draw(screen):
             kill_point = 0
             bonus_point = 0
@@ -153,6 +194,10 @@ while PLAY:
         screen.fill('darkred')
         draw_text('JumpShoot', font1, 'black', SCREEN_WIDTH * 0.34, 50)
         if start_button.draw(screen):
+            time1 = time.strftime("%H:%M:%S").split(':')
+            TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+            TIMER = 0
+            SUM_TIMER = 0
             start_game = True
             start_intro = True
         if Governance_and_rules_button.draw(screen):
@@ -165,6 +210,10 @@ while PLAY:
             screen.fill('darkred')
             draw_text('Меню', font1, 'black', SCREEN_WIDTH * 0.427, 50)
             if restart_button.draw(screen):
+                time1 = time.strftime("%H:%M:%S").split(':')
+                TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                TIMER = 0
+                SUM_TIMER = 0
                 kill_point = 0
                 bonus_point = 0
                 bird_point = 0
@@ -186,6 +235,10 @@ while PLAY:
             if exit_button.draw(screen):
                 PLAY = False
             if start_button.draw(screen):
+                time1 = time.strftime("%H:%M:%S").split(':')
+                TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                TIMER = 0
+                SUM_TIMER = 0
                 menu = False
                 pause = False
             if Governance_and_rules_button.draw(screen):
@@ -239,11 +292,6 @@ while PLAY:
             kill_point += enemy.update()
             enemy.draw(screen)
 
-        for bird in bird_group:
-            bird_point += bird.update_animation(player)
-            bird.move(SCREEN_SCROLL, player)
-            bird.draw(screen)
-
         bullet_group.update(player, world, SCREEN_SCROLL)
         bullet_group.draw(screen)
 
@@ -268,8 +316,13 @@ while PLAY:
         exit_group.update(SCREEN_SCROLL)
         exit_group.draw(screen)
 
+        for bird in bird_group:
+            bird_point += bird.update_animation(player)
+            bird.move(SCREEN_SCROLL, player)
+            bird.draw(screen)
+
         if start_intro:
-            if True:
+            if intro_fade.fade(screen):
                 start_intro = False
                 intro_fade.fade_counter = 0
 
@@ -298,6 +351,7 @@ while PLAY:
                 bg_scroll = 0
                 world_data = reset_level()
                 if level <= MAX_LEVELS:
+                    SUM_TIMER += TIMER
 
                     with open(f'level{level}_data.csv', newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=',')
@@ -336,6 +390,10 @@ while PLAY:
                 if exit_button.draw(screen):
                     PLAY = False
                 if restart_button.draw(screen):
+                    time1 = time.strftime("%H:%M:%S").split(':')
+                    TIMER_START = int(time1[0]) * 360 + int(time1[1]) * 60 + int(time1[2])
+                    TIMER = 0
+                    SUM_TIMER = 0
                     kill_point = 0
                     bonus_point = 0
                     bird_point = 0
