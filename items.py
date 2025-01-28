@@ -31,6 +31,9 @@ class ItemBox(pygame.sprite.Sprite):
                 player.grenades += self.count
             elif self.item_type == 'Bonus':
                 self.kill()
+                self.count = 10
+                message = Message(self.count, player.rect.midtop[0], player.rect.midtop[1])
+                message_group.add(message)
                 return 10
             message = Message(self.count, player.rect.midtop[0], player.rect.midtop[1])
             message_group.add(message)
