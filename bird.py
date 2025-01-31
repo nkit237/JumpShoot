@@ -1,6 +1,7 @@
 from create_pers import *
 from explosion import *
 from image import *
+from boom import Boom
 
 
 class Bird(pygame.sprite.Sprite):
@@ -9,6 +10,7 @@ class Bird(pygame.sprite.Sprite):
         self.health = 100
         self.speed = speed
         self.cooldown = 0
+        self.cooldown_boom = 0
         self.flip = False
         self.alive = True
         self.direction = 1
@@ -84,7 +86,10 @@ class Bird(pygame.sprite.Sprite):
                         abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 50
 
-
-def bombs(self, player):
-    if player.rect.midtop[1] == self.rect.y:
-        pass
+    def bombs(self, player):
+        if self.cooldown_boom > 0:
+            self.cooldown_boom -= 1
+        if (self.rect.center[0] - 30 <= player.rect.x <= self.rect.center[0] + 30) and self.cooldown_boom == 0:
+            boom = Boom(self.rect.centerx, self.rect.centery)
+            boom_group.add(boom)
+            self.cooldown_boom = 100
