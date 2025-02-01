@@ -47,6 +47,7 @@ start_intro = False
 pause = False
 menu = False
 info = False
+music = False
 kill_point = 0
 bonus_point = 0
 bird_point = 0
@@ -97,6 +98,10 @@ Governance_and_rules_button = button.Button(SCREEN_WIDTH // 2 - 160, SCREEN_HEIG
 back_button = button.Button(0, 0, back_img, 2)
 main_menu_button = button.Button(SCREEN_WIDTH // 2 - 110, SCREEN_HEIGHT - 250, main_menu_img, 1)
 
+pygame.mixer.music.load('data/audio/music2.mp3')
+pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.play(-1, 0.0, 1000)
+
 clock = pygame.time.Clock()
 FPS = 60
 PLAY = True
@@ -116,6 +121,9 @@ while PLAY:
             create_particles((x - bg_scroll * 0.6, y))
             splashes_cooldown = random.randint(20, 100)
         splashes_cooldown -= 1
+
+    if music:
+        pygame.mixer.music.pause()
 
     if info:
         screen.fill('black')
@@ -433,6 +441,10 @@ while PLAY:
             if event.key == pygame.K_p:
                 if start_game:
                     pause = not pause
+            if event.key == pygame.K_m:
+                if music:
+                    pygame.mixer.music.play()
+                music = not music
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_a:
