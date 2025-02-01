@@ -300,6 +300,12 @@ while PLAY:
             kill_point += enemy.update()
             enemy.draw(screen)
 
+        for bird in bird_group:
+            bird_point += bird.update_animation(player)
+            bird.move(SCREEN_SCROLL, player)
+            bird.draw(screen)
+            bird.bombs(player, world)
+
         bullet_group.update(player, world, SCREEN_SCROLL)
         bullet_group.draw(screen)
 
@@ -314,6 +320,9 @@ while PLAY:
         item_box_group.draw(screen)
 
         message_group.update()
+
+        boom_group.update(player, world, SCREEN_SCROLL)
+        boom_group.draw(screen)
 
         decoration_group.update(SCREEN_SCROLL)
         decoration_group.draw(screen)

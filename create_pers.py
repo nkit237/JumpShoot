@@ -11,6 +11,7 @@ decoration_group = pygame.sprite.Group()
 exit_group = pygame.sprite.Group()
 bird_group = pygame.sprite.Group()
 message_group = pygame.sprite.Group()
+boom_group = pygame.sprite.Group()
 
 splashes_group = pygame.sprite.Group()
 
