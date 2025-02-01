@@ -216,7 +216,7 @@ while PLAY:
             bird_point += bird.update_animation(player)
             bird.move(SCREEN_SCROLL, player)
             bird.draw(screen)
-            bird.bombs(player)
+            bird.bombs(player, world)
 
         bullet_group.update(player, world, SCREEN_SCROLL)
         bullet_group.draw(screen)

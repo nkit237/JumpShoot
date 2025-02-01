@@ -86,10 +86,15 @@ class Bird(pygame.sprite.Sprite):
                         abs(self.rect.centery - enemy.rect.centery) < TILE_SIZE * 2:
                     enemy.health -= 50
 
-    def bombs(self, player):
+    def bombs(self, player, world):
         if self.cooldown_boom > 0:
             self.cooldown_boom -= 1
         if (self.rect.center[0] - 30 <= player.rect.x <= self.rect.center[0] + 30) and self.cooldown_boom == 0:
-            boom = Boom(self.rect.centerx, self.rect.centery)
-            boom_group.add(boom)
-            self.cooldown_boom = 100
+            c = 0
+            for tile in world.obstacle_list:
+                if tile[1].y <= player.rect.centery and tile[1].collidepoint(player.rect.centerx, tile[1].y):
+                    c += 1
+            if c == 0:
+                boom = Boom(self.rect.centerx, self.rect.centery)
+                boom_group.add(boom)
+                self.cooldown_boom = 50
