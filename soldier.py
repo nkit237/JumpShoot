@@ -1,6 +1,4 @@
 import os
-import pygame
-from math import inf
 import random
 from image import *
 from bullet import Bullet

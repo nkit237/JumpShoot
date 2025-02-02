@@ -1,5 +1,5 @@
 from create_pers import *
-from explosion import *
+from explosion import Explosion
 from image import *
 from boom import Boom
 

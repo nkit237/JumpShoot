@@ -1,4 +1,4 @@
-from explosion import *
+from explosion import Explosion
 from image import *
 from create_pers import *
 

@@ -1,10 +1,12 @@
-from interface import *
+from image import *
+from create_pers import *
+from interface import HealthBar
 from soldier import Soldier
-from bird import *
-from items import *
-from decoration import *
-from water import *
-from level_up import *
+from bird import Bird
+from items import ItemBox
+from decoration import Decoration
+from water import Water
+from level_up import Exit
 
 
 class World:

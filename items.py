@@ -1,7 +1,4 @@
-import pygame
-
 from message import Message
-from settings import *
 from image import *
 from create_pers import *
 

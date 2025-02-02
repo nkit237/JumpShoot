@@ -2,10 +2,13 @@ import time
 import button
 import csv
 import sqlite3
-from granade import *
-from fade import *
-from world import *
-from splashes import *
+import random
+from image import *
+from create_pers import *
+from granade import Grenade
+from fade import ScreenFade
+from world import World
+from splashes import Particle
 
 font = pygame.font.SysFont('consolas', 20)
 font1 = pygame.font.SysFont('consolas', 65)
@@ -107,7 +110,6 @@ FPS = 60
 PLAY = True
 TIMER = -1
 SUM_TIMER = 0
-
 while PLAY:
     clock.tick(FPS)
     if TIMER != -1 and not pause and level <= 3:
@@ -134,7 +136,7 @@ while PLAY:
         screen.fill('darkred')
         h = str(SUM_TIMER + TIMER // 360).zfill(2)
         m = str((SUM_TIMER + TIMER // 60) % 60).zfill(2)
-        s = str(SUM_TIMER + TIMER % 360).zfill(2)
+        s = str(SUM_TIMER + TIMER % 60).zfill(2)
         t1 = f'За поражённых  противников вы набрали {kill_point} очков!'
         t2 = f'За поражённых птиц вы набрали {bird_point} очков!'
         t3 = f'За сбор бонусов вы набрали {bonus_point} очков!'
