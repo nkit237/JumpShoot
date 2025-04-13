@@ -1,14 +1,15 @@
+import csv
+import random
+import sqlite3
 import time
 import button
-import csv
-import sqlite3
-import random
-from image import *
+
 from create_pers import *
-from granade import Grenade
 from fade import ScreenFade
-from world import World
+from granade import Grenade
+from image import *
 from splashes import Particle
+from world import World
 
 font = pygame.font.SysFont('consolas', 20)
 font1 = pygame.font.SysFont('consolas', 65)
@@ -133,7 +134,7 @@ while PLAY:
         if back_button.draw(screen):
             info = False
     elif final_menu:
-        screen.fill('darkred')
+        screen.fill('')
         h = str(SUM_TIMER + TIMER // 360).zfill(2)
         m = str((SUM_TIMER + TIMER // 60) % 60).zfill(2)
         s = str(SUM_TIMER + TIMER % 60).zfill(2)
@@ -201,7 +202,8 @@ while PLAY:
             PLAY = False
 
     elif not start_game:
-        screen.fill('darkred')
+        screen.fill('black')
+        screen.blit(main_img, (0, 0))
         draw_text('JumpShoot', font1, 'black', SCREEN_WIDTH * 0.34, 50)
         if start_button.draw(screen):
             time1 = time.strftime("%H:%M:%S").split(':')
@@ -217,7 +219,8 @@ while PLAY:
 
     elif pause:
         if menu:
-            screen.fill('darkred')
+            screen.fill('black')
+            screen.blit(main_img, (0, 0))
             draw_text('Меню', font1, 'black', SCREEN_WIDTH * 0.427, 50)
             if restart_button.draw(screen):
                 time1 = time.strftime("%H:%M:%S").split(':')
