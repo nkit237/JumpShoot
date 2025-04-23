@@ -38,6 +38,8 @@ Governance_and_rules_img = pygame.image.load('data/img/Governance_and_rules_img.
 back_img = pygame.image.load('data/img/back.jpg').convert_alpha()
 
 main_menu_img = pygame.image.load('data/img/main_menu.jpg').convert_alpha()
+main_img = pygame.image.load('data/img/main.jpg').convert_alpha()
+main_img = pygame.transform.scale(main_img, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 Governance = pygame.image.load('data/img/info/G_R.jpg').convert_alpha()
 Governance = pygame.transform.scale(Governance, (SCREEN_WIDTH, SCREEN_HEIGHT))
